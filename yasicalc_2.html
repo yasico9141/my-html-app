@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yasicalc</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* Base Colors (Dark & Clean) */
+            --color-bg-base: hsl(220, 10%, 8%);
+            --color-bg-surface: hsl(220, 10%, 12%);
+            --color-bg-elevated: hsl(220, 10%, 16%);
+
+            /* Brand & Accent Colors */
+            --color-primary: hsl(195, 80%, 55%);
+            --color-primary-hover: hsl(195, 80%, 65%);
+            --color-primary-muted: hsla(195, 80%, 55%, 0.15);
+            
+            --color-accent: hsl(25, 90%, 60%); /* Orange */
+            --color-accent-muted: hsla(25, 90%, 60%, 0.15);
+
+            /* UI Colors */
+            --color-success: hsl(150, 40%, 50%);
+            --color-warning: hsl(40, 90%, 55%);
+            --color-error: hsl(0, 70%, 60%);
+            
+            /* Typography Colors */
+            --color-text-primary: hsl(220, 10%, 95%);
+            --color-text-secondary: hsl(220, 10%, 65%);
+            --color-text-tertiary: hsl(220, 10%, 45%);
+            
+            /* Borders */
+            --color-border: hsla(220, 10%, 100%, 0.08);
+            --color-border-hover: hsla(220, 10%, 100%, 0.15);
+
+            /* Spacing (Base 8px) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 16px;
+            --space-4: 24px;
+            --space-5: 32px;
+            --space-6: 48px;
+
+            /* Radius (Modest for utility feel) */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+
+            /* Tap Targets */
+            --tap-min: 44px;
+
+            /* Shadows & Effects (Clean depth) */
+            --shadow-soft: 0 4px 24px hsla(0, 0%, 0%, 0.4);
+            --shadow-hard: 0 8px 32px hsla(0, 0%, 0%, 0.6);
+
+            /* Typography */
+            --font-main: 'Inter', sans-serif;
+            --font-jp: 'Noto Sans JP', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-jp), var(--font-main);
+            background-color: var(--color-bg-base);
+            color: var(--color-text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Generic Utilities */
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: var(--space-2);
+        }
+
+        .gap-4 {
+            gap: var(--space-3);
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-error {
+            color: var(--color-error);
+        }
+
+        .text-muted {
+            color: var(--color-text-secondary);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: hsla(0, 0%, 100%, 0.1);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsla(0, 0%, 100%, 0.2);
+        }
+
+        /* Header */
+        header {
+            height: 72px;
+            padding: 0 var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--color-bg-base); /* Blend with background */
+            border-bottom: 1px solid var(--color-border);
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: var(--font-main);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .unit-config {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            padding: 6px var(--space-2);
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .unit-config:focus-within,
+        .unit-config:hover {
+            border-color: var(--color-border);
+            background: hsla(0, 0%, 100%, 0.03);
+        }
+
+        .unit-config span {
+            margin-right: var(--space-1);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-text-tertiary);
+        }
+
+        .unit-config input {
+            background: transparent;
+            border: none;
+            color: var(--color-text-primary);
+            width: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .app-controls {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .app-controls button {
+            background: transparent;
+            color: var(--color-text-secondary);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-controls button:hover {
+            color: var(--color-text-primary);
+            background: hsla(0, 0%, 100%, 0.05);
+        }
+
+        .btn-menu {
+            display: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-menu:hover {
+            color: var(--color-text-primary);
+            border-color: var(--color-border-hover);
+            background: hsla(0, 0%, 100%, 0.05);
+        }
+
+        .btn-help {
+            color: var(--color-primary) !important;
+        }
+
+        .btn-help:hover {
+            background: var(--color-primary-muted) !important;
+        }
+
+        .btn-danger {
+            color: var(--color-error) !important;
+        }
+
+        .btn-danger:hover {
+            color: var(--color-text-primary) !important;
+            background: var(--color-accent) !important; /* Emphasize danger on hover */
+        }
+
+        /* Layout */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            padding: var(--space-4);
+            gap: var(--space-4);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: hsla(220, 10%, 4%, 0.55);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 40;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background: var(--color-bg-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-4) var(--space-3);
+        }
+
+        .sheet-list-header {
+            margin-bottom: var(--space-3);
+            padding: 0 var(--space-2);
+            font-size: 0.7rem;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .sheet-list {
+            flex: 1;
+            overflow-y: auto;
+            margin: 0 0 var(--space-3) 0;
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .sheet-item {
+            padding: 10px var(--space-3);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            color: var(--color-text-primary);
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent; /* Active indicator placeholder */
+        }
+
+        .sheet-item:hover {
+            background: hsla(0, 0%, 100%, 0.03);
+        }
+
+        .sheet-item.active {
+            background: var(--color-primary-muted);
+            border-left-color: var(--color-primary);
+        }
+
+        .sheet-item .sheet-total {
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .sheet-item.active .sheet-name {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .sheet-item.active .sheet-total {
+            color: var(--color-primary);
+        }
+
+        .summary-tab-btn {
+            padding: var(--space-3);
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-weight: 600;
+            justify-content: center;
+            margin-bottom: var(--space-2);
+            color: var(--color-text-secondary);
+        }
+
+        .summary-tab-btn:hover {
+            border-color: var(--color-text-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .summary-tab-btn.active {
+            background: hsla(0, 0%, 100%, 0.05);
+            border-color: var(--color-text-secondary);
+            color: var(--color-text-primary);
+        }
+
+        .add-sheet-btn {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px dashed var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-tertiary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .add-sheet-btn:hover {
+            border-style: solid;
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: hsla(195, 80%, 55%, 0.05);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            background: transparent;
+            padding: var(--space-5) var(--space-6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid hsla(0, 0%, 100%, 0.05);
+        }
+
+        .sheet-title-input {
+            background: transparent;
+            border: none;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            width: 350px;
+            transition: opacity 0.2s;
+            padding: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .sheet-title-input:hover,
+        .sheet-title-input:focus {
+            opacity: 0.8;
+        }
+
+        .sheet-title-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .sheet-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .sheet-actions button {
+            background: transparent;
+            color: var(--color-text-secondary);
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .sheet-actions button:hover {
+            color: var(--color-text-primary);
+            border-color: var(--color-text-tertiary);
+        }
+
+        .sheet-actions button.btn-delete {
+            color: var(--color-error);
+            border-color: hsla(0, 70%, 60%, 0.3);
+        }
+
+        .sheet-actions button.btn-delete:hover {
+            background: hsla(0, 70%, 60%, 0.1);
+            border-color: var(--color-error);
+        }
+
+        /* Rows Table */
+        .rows-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: var(--space-2);
+        }
+
+        .row-item {
+            display: grid;
+            grid-template-columns: 32px 1fr 140px 180px 72px;
+            gap: var(--space-4);
+            align-items: center;
+            padding: var(--space-2) 4px;
+            border-bottom: 1px solid var(--color-border);
+            transition: background 0.2s;
+        }
+
+        .row-item:hover {
+            background: hsla(0, 0%, 100%, 0.02);
+            border-bottom-color: var(--color-border-hover);
+        }
+
+        .row-drag-handle {
+            user-select: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: hsla(0, 0%, 100%, 0.05);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .row-drag-handle:active {
+            transform: scale(0.9);
+        }
+
+        .row-input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--color-text-primary);
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            width: 100%;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .row-input:focus,
+        .row-input:hover {
+            background: hsla(0, 0%, 100%, 0.03);
+            border-color: var(--color-primary);
+        }
+
+        .row-select {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='hsl(220, 10%25, 65%25)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 14px;
+            padding-right: 28px;
+        }
+
+        .row-select:focus,
+        .row-select:hover {
+            border-color: var(--color-primary);
+            background-color: hsla(0, 0%, 100%, 0.02);
+        }
+
+        .row-select option,
+        .row-select optgroup {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-primary);
+        }
+
+        .row-select option:disabled {
+            color: var(--color-text-tertiary);
+        }
+
+        .row-select option:checked {
+            background: var(--color-primary-muted);
+            color: var(--color-primary);
+        }
+
+        .row-amount {
+            font-family: var(--font-main);
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .action-row-btn,
+        .delete-row-btn {
+            color: var(--color-text-tertiary);
+            background: transparent;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+            font-size: 0.85rem;
+        }
+
+        .row-item:hover .action-row-btn,
+        .row-item:hover .delete-row-btn {
+            opacity: 1;
+        }
+
+        .action-row-btn:hover {
+            color: var(--color-text-primary);
+            background: var(--color-border);
+        }
+
+        .delete-row-btn:hover {
+            color: var(--color-error);
+            background: hsla(0, 70%, 60%, 0.1);
+        }
+
+        .add-row-btn {
+            margin-top: var(--space-4);
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px dashed var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-tertiary);
+            font-weight: 500;
+        }
+
+        .add-row-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: hsla(195, 80%, 55%, 0.05);
+            border-style: solid;
+        }
+
+        /* Footer / Total */
+        .sheet-footer {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid hsla(0, 0%, 100%, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .total-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--color-text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: hsla(220, 10%, 4%, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            width: 90%;
+            max-width: 540px;
+            box-shadow: var(--shadow-hard);
+            position: relative;
+            transform: scale(0.98) translateY(10px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--space-3);
+            right: var(--space-3);
+            background: transparent;
+            border: none;
+            color: var(--color-text-tertiary);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--color-text-primary);
+            background: hsla(0, 0%, 100%, 0.05);
+        }
+
+        .help-section {
+            margin-bottom: var(--space-4);
+        }
+
+        .help-section h3 {
+            color: var(--color-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-2);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .help-section p,
+        .help-section ul {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .help-section ul {
+            padding-left: var(--space-4);
+            margin-top: var(--space-2);
+        }
+
+        .help-section li {
+            margin-bottom: var(--space-1);
+        }
+
+        .sheet-item.over {
+            border-left-color: var(--color-primary);
+            background: hsla(0, 0%, 100%, 0.05);
+        }
+
+        /* Summary Table */
+        .summary-table-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: var(--space-4);
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th {
+            text-align: left;
+            padding: var(--space-3) var(--space-2);
+            color: var(--color-text-tertiary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .summary-table td {
+            padding: var(--space-3) var(--space-2);
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-size: 1rem;
+        }
+
+        /* Responsive layout for tablets/phones */
+        @media (max-width: 960px) {
+            body {
+                overflow: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            header {
+                height: auto;
+                padding: var(--space-3);
+                gap: var(--space-3);
+                flex-wrap: wrap;
+            }
+
+            header .flex.items-center {
+                width: 100%;
+                justify-content: space-between;
+                gap: var(--space-3);
+                flex-wrap: wrap;
+            }
+
+            .main-container {
+                flex-direction: column;
+                padding: var(--space-3);
+                gap: var(--space-3);
+            }
+
+            aside {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+                padding: var(--space-3);
+            }
+
+            main {
+                padding: var(--space-4);
+            }
+
+            .sheet-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .sheet-title-input {
+                width: 100%;
+                font-size: 1.5rem;
+            }
+
+            .sheet-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .rows-container {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body.sidebar-open {
+                overflow: hidden;
+            }
+
+            .btn-menu {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .unit-config {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .app-controls {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .app-controls button {
+                flex: 1 1 140px;
+                justify-content: center;
+            }
+
+            .app-controls button,
+            .btn-menu {
+                min-height: var(--tap-min);
+            }
+
+            .unit-config {
+                min-height: var(--tap-min);
+            }
+
+            .unit-config input {
+                min-height: var(--tap-min);
+            }
+
+            .main-container {
+                padding: var(--space-3);
+            }
+
+            aside {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 85vw;
+                max-width: 320px;
+                padding: var(--space-4) var(--space-3);
+                border-right: 1px solid var(--color-border);
+                border-bottom: none;
+                transform: translateX(-110%);
+                transition: transform 0.25s ease;
+                z-index: 50;
+                box-shadow: var(--shadow-hard);
+            }
+
+            body.sidebar-open aside {
+                transform: translateX(0);
+            }
+
+            body.sidebar-open .sidebar-backdrop {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .sheet-list {
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+                max-height: calc(100vh - 220px);
+            }
+
+            .sheet-item {
+                min-width: auto;
+                min-height: var(--tap-min);
+            }
+
+            aside > div[style*="flex:1"] {
+                display: none;
+            }
+
+            .add-sheet-btn,
+            .summary-tab-btn {
+                width: 100%;
+                min-height: var(--tap-min);
+            }
+
+            .add-row-btn {
+                min-height: var(--tap-min);
+            }
+
+            main {
+                padding: var(--space-3);
+            }
+
+            .sheet-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-2);
+            }
+
+            .total-amount {
+                font-size: 2.2rem;
+            }
+
+            .sheet-actions button,
+            .action-row-btn,
+            .delete-row-btn,
+            .row-drag-handle {
+                width: var(--tap-min);
+                height: var(--tap-min);
+            }
+
+            .action-row-btn,
+            .delete-row-btn {
+                opacity: 1;
+            }
+
+            .row-input,
+            .row-select,
+            .sheet-title-input {
+                min-height: var(--tap-min);
+                font-size: 1rem;
+            }
+
+            .row-input {
+                padding: 10px 12px;
+            }
+
+            .row-select {
+                padding: 10px 12px;
+                padding-right: 30px;
+            }
+
+            .row-item {
+                grid-template-columns: var(--tap-min) 1fr;
+                grid-template-areas:
+                    "drag label"
+                    "drag type"
+                    "drag value"
+                    "drag actions";
+                align-items: start;
+                gap: var(--space-2) var(--space-3);
+            }
+
+            .row-item > :nth-child(1) {
+                grid-area: drag;
+            }
+
+            .row-item > :nth-child(2) {
+                grid-area: label;
+            }
+
+            .row-item > :nth-child(3) {
+                grid-area: type;
+            }
+
+            .row-item > :nth-child(4) {
+                grid-area: value;
+            }
+
+            .row-item > :nth-child(5) {
+                grid-area: actions;
+                justify-content: flex-start;
+            }
+
+            .summary-table-container {
+                overflow-x: auto;
+            }
+
+            .summary-table {
+                min-width: 420px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .total-amount {
+                font-size: 1.9rem;
+            }
+
+            .row-input,
+            .row-select {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <span>yasicalc</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button class="btn-menu" onclick="app.toggleSidebar()" aria-label="メニュー">メニュー</button>
+            <div class="unit-config">
+                <span>単位</span>
+                <input type="text" id="unitInput" value="円" maxlength="5">
+            </div>
+            <div class="app-controls">
+                <button onclick="app.showHelp()" class="btn-help">ヘルプ</button>
+                <button onclick="app.exportData()">保存 (JSON)</button>
+                <button onclick="document.getElementById('fileInput').click()">読込</button>
+                <button onclick="app.resetData()" class="btn-danger">初期化</button>
+                <input type="file" id="fileInput" class="hidden" accept=".json" onchange="app.importData(this)">
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar-backdrop" onclick="app.closeSidebar()"></div>
+
+    <div class="main-container">
+        <!-- SIDEBAR -->
+        <aside>
+            <div class="sheet-list-header">Sheets</div>
+            <ul class="sheet-list" id="sheetList">
+                <!-- Generated by JS -->
+            </ul>
+            <button class="add-sheet-btn" onclick="app.addSheet()">+ Add New Sheet</button>
+            <div style="flex:1"></div>
+            <button class="sheet-item summary-tab-btn" id="summaryTab" onclick="app.selectSummary()">
+                <span>まとめで見る</span>
+            </button>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main id="mainEditor">
+            <!-- Dynamic Content -->
+        </main>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal-overlay" onclick="if(event.target===this) app.hideHelp()">
+        <div class="modal-content">
+            <button class="modal-close" onclick="app.hideHelp()">✕</button>
+            <h2 style="margin-top:0; color: #fff; text-align: center;">yasicalc の使い方</h2>
+            <div class="help-section">
+                <h3>基本的な使い方</h3>
+                <p>「金額」を入力すると自動で合計が計算されます。左側のシート一覧から追加・切り替えが可能です。</p>
+                <ul>
+                    <li><strong>＋ / － ボタン:</strong> 項目の左側にあるボタンで、加算と減算を切り替えることができます。</li>
+                    <li><strong>行の追加:</strong> シート下部の「+ 行を追加」から項目を追加できます。</li>
+                    <li><strong>シート名の変更:</strong> シート上部のタイトルをクリックして任意の名称に変更できます。</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>シート間の参照機能</h3>
+                <p>他のシートで計算した合計値を、別のシートで参照することが可能です。</p>
+                <ul>
+                    <li>項目の種類を「参照」に変更すると、他のシートを選択できるようになります。</li>
+                    <li>「まとめで見る」タブを使用すると、全シートの総合計を一覧で確認できます。</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>保存と読み込み</h3>
+                <p>右上のボタンから、現在のデータをJSON形式で保存できます。「読込」ボタンからのデータ復元も可能です。</p>
+            </div>
+            <p style="text-align:center; color: var(--text-muted); font-size: 0.85rem; margin-top:20px;">
+                ドラッグ＆ドロップによるシートの並び替えも可能です。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * yasicalc Core Logic
+         * - Single State -> Render Loop
+         * - Cycle Detection
+         * - LocalStorage Persistence
+         * - Phase 2: Sign Switching & Sheet Reordering
+         */
+
+        const Utils = {
+            generateId: () => Math.random().toString(36).substr(2, 9),
+            formatNumber: (num) => new Intl.NumberFormat('ja-JP').format(num)
+        };
+
+        const INITIAL_STATE = {
+            unit: '円',
+            sheets: [
+                {
+                    id: 'sheet_1',
+                    name: 'Sheet 1',
+                    rows: [
+                        { id: 'row_1', label: '項目 A', type: 'value', value: 0, refSheetId: null, operator: 1 },
+                        { id: 'row_2', label: '項目 B', type: 'value', value: 0, refSheetId: null, operator: 1 }
+                    ]
+                }
+            ],
+            view: 'sheet', // 'sheet' or 'summary'
+            activeSheetId: 'sheet_1'
+        };
+
+        class App {
+            constructor() {
+                this.state = this.loadState() || JSON.parse(JSON.stringify(INITIAL_STATE));
+                // Migrate old state if needed (add operator if missing)
+                this.migrateState();
+                this.cache = {};
+                this.dragSrcEl = null; // For D&D
+                this.sidebarOpen = false;
+                this.init();
+            }
+
+            migrateState() {
+                this.state.sheets.forEach(sheet => {
+                    sheet.rows.forEach(row => {
+                        if (row.operator === undefined) row.operator = 1;
+                    });
+                });
+            }
+
+            init() {
+                // Initial Bindings
+                document.getElementById('unitInput').value = this.state.unit;
+                document.getElementById('unitInput').addEventListener('input', (e) => {
+                    this.state.unit = e.target.value;
+                    this.saveAndRender();
+                });
+
+                this.applySidebarState();
+                window.addEventListener('resize', () => {
+                    if (!window.matchMedia('(max-width: 720px)').matches && this.sidebarOpen) {
+                        this.toggleSidebar(false);
+                    }
+                });
+
+                this.render();
+            }
+
+            // --- Mobile Sidebar ---
+
+            applySidebarState() {
+                document.body.classList.toggle('sidebar-open', this.sidebarOpen);
+            }
+
+            toggleSidebar(force) {
+                if (typeof force === 'boolean') {
+                    this.sidebarOpen = force;
+                } else {
+                    this.sidebarOpen = !this.sidebarOpen;
+                }
+                this.applySidebarState();
+            }
+
+            closeSidebar() {
+                if (this.sidebarOpen) {
+                    this.toggleSidebar(false);
+                }
+            }
+
+            maybeCloseSidebar() {
+                if (window.matchMedia('(max-width: 720px)').matches) {
+                    this.closeSidebar();
+                }
+            }
+
+            // --- State Management ---
+
+            saveState() {
+                localStorage.setItem('yasicalc_data', JSON.stringify(this.state));
+            }
+
+            loadState() {
+                const data = localStorage.getItem('yasicalc_data');
+                return data ? JSON.parse(data) : null;
+            }
+
+            saveAndRender() {
+                this.saveState();
+                this.render();
+            }
+
+            // --- Calculation Engine ---
+
+            calculateSheetTotal(sheetId, visited = new Set()) {
+                if (visited.has(sheetId)) {
+                    return { value: 0, error: 'LOOP' };
+                }
+
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                if (!sheet) return { value: 0, error: 'MISSING' };
+
+                let total = 0;
+                let hasError = null;
+
+                visited.add(sheetId);
+
+                for (const row of sheet.rows) {
+                    const op = row.operator !== undefined ? row.operator : 1;
+
+                    if (row.type === 'value') {
+                        total += (Number(row.value) || 0) * op;
+                    } else if (row.type === 'ref') {
+                        if (!row.refSheetId) continue;
+
+                        // Recursive call
+                        const result = this.calculateSheetTotal(row.refSheetId, new Set(visited));
+
+                        if (result.error) {
+                            hasError = result.error;
+                        } else {
+                            total += result.value * op;
+                        }
+                    }
+                }
+
+                visited.delete(sheetId);
+                return { value: total, error: hasError };
+            }
+
+            // --- Actions ---
+
+            addSheet() {
+                const newId = Utils.generateId();
+                const newSheet = {
+                    id: newId,
+                    name: `New Sheet`,
+                    rows: [
+                        { id: Utils.generateId(), label: '新規項目', type: 'value', value: 0, refSheetId: null, operator: 1 }
+                    ]
+                };
+                this.state.sheets.push(newSheet);
+                this.state.activeSheetId = newId;
+                this.state.view = 'sheet';
+                this.saveAndRender();
+                this.maybeCloseSidebar();
+            }
+
+            duplicateSheet(sheetId) {
+                const sheetToDuplicate = this.state.sheets.find(s => s.id === sheetId);
+                if (!sheetToDuplicate) return;
+
+                const newSheetId = Utils.generateId();
+                // 行のidも新しく生成してディープコピーする
+                const newRows = sheetToDuplicate.rows.map(row => ({
+                    ...row,
+                    id: Utils.generateId()
+                }));
+
+                const newSheet = {
+                    id: newSheetId,
+                    name: `${sheetToDuplicate.name} (コピー)`,
+                    rows: newRows
+                };
+
+                // コピー元シートの直後に挿入する
+                const index = this.state.sheets.findIndex(s => s.id === sheetId);
+                this.state.sheets.splice(index + 1, 0, newSheet);
+
+                this.state.activeSheetId = newSheetId;
+                this.saveAndRender();
+            }
+
+            deleteSheet(sheetId) {
+                if (!confirm('このシートを削除しても本当によろしいですか？')) return;
+
+                this.state.sheets = this.state.sheets.filter(s => s.id !== sheetId);
+
+                // Remove references to this sheet
+                this.state.sheets.forEach(s => {
+                    s.rows.forEach(r => {
+                        if (r.refSheetId === sheetId) {
+                            r.refSheetId = null;
+                        }
+                    });
+                });
+
+                if (this.state.activeSheetId === sheetId) {
+                    this.state.activeSheetId = this.state.sheets[0]?.id || null;
+                    if (!this.state.activeSheetId && this.state.sheets.length === 0) {
+                        this.addSheet();
+                    }
+                }
+                this.saveAndRender();
+            }
+
+            selectSheet(sheetId) {
+                this.state.activeSheetId = sheetId;
+                this.state.view = 'sheet';
+                this.render();
+                this.maybeCloseSidebar();
+            }
+
+            selectSummary() {
+                this.state.view = 'summary';
+                this.render();
+                this.maybeCloseSidebar();
+            }
+
+            updateSheetName(id, newName) {
+                const sheet = this.state.sheets.find(s => s.id === id);
+                if (sheet) {
+                    sheet.name = newName;
+                    this.saveAndRender();
+                }
+            }
+
+            addRow(sheetId) {
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                if (sheet) {
+                    sheet.rows.push({
+                        id: Utils.generateId(),
+                        label: '',
+                        type: 'value',
+                        value: 0,
+                        refSheetId: null,
+                        operator: 1
+                    });
+                    this.saveAndRender();
+                }
+            }
+
+            duplicateRow(sheetId, rowId) {
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                if (sheet) {
+                    const rowToDuplicate = sheet.rows.find(r => r.id === rowId);
+                    if (rowToDuplicate) {
+                        const newRow = {
+                            ...rowToDuplicate,
+                            id: Utils.generateId()
+                        };
+                        const rowIndex = sheet.rows.findIndex(r => r.id === rowId);
+                        sheet.rows.splice(rowIndex + 1, 0, newRow);
+                        this.saveAndRender();
+                    }
+                }
+            }
+
+            deleteRow(sheetId, rowId) {
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                if (sheet) {
+                    sheet.rows = sheet.rows.filter(r => r.id !== rowId);
+                    this.saveAndRender();
+                }
+            }
+
+            updateRow(sheetId, rowId, field, value) {
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                const row = sheet.rows.find(r => r.id === rowId);
+                if (row) {
+                    row[field] = value;
+                    this.saveAndRender();
+                }
+            }
+
+            toggleOperator(sheetId, rowId) {
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+                const row = sheet.rows.find(r => r.id === rowId);
+                if (row) {
+                    row.operator = (row.operator === 1) ? -1 : 1;
+                    this.saveAndRender();
+                }
+            }
+
+            // Drag & Drop for Sheets
+            handleDragStart(e, index) {
+                this.dragSrcIndex = index;
+                e.dataTransfer.effectAllowed = 'move';
+                e.target.style.opacity = '0.4';
+            }
+
+            handleDragOver(e) {
+                if (e.preventDefault) {
+                    e.preventDefault(); // Necessary. Allows us to drop.
+                }
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            }
+
+            handleDragEnter(e) {
+                e.target.closest('li').classList.add('over');
+            }
+
+            handleDragLeave(e) {
+                e.target.closest('li').classList.remove('over');
+            }
+
+            handleDrop(e, dropIndex) {
+                if (e.stopPropagation) {
+                    e.stopPropagation(); // stops the browser from redirecting.
+                }
+
+                if (this.dragSrcIndex !== dropIndex) {
+                    const sheets = this.state.sheets;
+                    const [movedSheet] = sheets.splice(this.dragSrcIndex, 1);
+                    sheets.splice(dropIndex, 0, movedSheet);
+                    this.saveAndRender();
+                }
+                return false;
+            }
+
+            handleDragEnd(e) {
+                e.target.style.opacity = '1';
+                document.querySelectorAll('.sheet-item').forEach(item => {
+                    item.classList.remove('over');
+                });
+            }
+
+
+            // Export/Import
+            exportData() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "yasicalc_data.json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+
+            importData(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if (json.sheets) {
+                            this.state = json;
+                            this.migrateState(); // Ensure compatibility
+                            this.saveAndRender();
+                            alert('読み込みが完了しました。');
+                        } else {
+                            alert('データの形式が正しくありません。');
+                        }
+                    } catch (err) {
+                        alert('ファイルが破損しています。');
+                    }
+                };
+                reader.readAsText(file);
+                input.value = '';
+            }
+
+            resetData() {
+                if (confirm('すべてのデータを消去して初期状態に戻します。本当によろしいですか？')) {
+                    this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+                    this.saveAndRender();
+                }
+            }
+
+            showHelp() {
+                document.getElementById('helpModal').classList.add('show');
+            }
+
+            hideHelp() {
+                document.getElementById('helpModal').classList.remove('show');
+            }
+
+            // --- Rendering ---
+
+            render() {
+                this.renderSidebar();
+                this.renderMain();
+            }
+
+            renderSidebar() {
+                const list = document.getElementById('sheetList');
+                list.innerHTML = '';
+
+                this.state.sheets.forEach((sheet, index) => {
+                    const li = document.createElement('li');
+
+                    li.className = `sheet-item ${this.state.view === 'sheet' && this.state.activeSheetId === sheet.id ? 'active' : ''}`;
+                    li.draggable = true;
+
+                    // D&D Events
+                    li.ondragstart = (e) => this.handleDragStart(e, index);
+                    li.ondragover = (e) => this.handleDragOver(e);
+                    li.ondragenter = (e) => this.handleDragEnter(e);
+                    li.ondragleave = (e) => this.handleDragLeave(e);
+                    li.ondrop = (e) => this.handleDrop(e, index);
+                    li.ondragend = (e) => this.handleDragEnd(e);
+
+                    // Click to select (checking if not dragging would be ideal but simple click works fine here usually)
+                    li.onclick = (e) => {
+                        // Prevent selection when interacting with specific sub-elements if needed
+                        this.selectSheet(sheet.id);
+                    };
+
+                    const total = this.calculateSheetTotal(sheet.id);
+                    const totalDisplay = total.error ? 'Err' : Utils.formatNumber(total.value);
+
+                    li.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:var(--space-2);">
+                            <span style="color:var(--text-tertiary); cursor:grab;">⋮⋮</span>
+                            <span class="sheet-name">${sheet.name}</span>
+                        </div>
+                        <span class="sheet-total">${totalDisplay} <span style="font-size:0.7em">${this.state.unit}</span></span>
+                    `;
+                    list.appendChild(li);
+                });
+
+                const summaryBtn = document.getElementById('summaryTab');
+                if (this.state.view === 'summary') {
+                    summaryBtn.classList.add('active');
+                } else {
+                    summaryBtn.classList.remove('active');
+                }
+            }
+
+            renderMain() {
+                const container = document.getElementById('mainEditor');
+                container.innerHTML = '';
+
+                if (this.state.view === 'summary') {
+                    this.renderSummary(container);
+                } else {
+                    this.renderSheetEditor(container);
+                }
+            }
+
+            renderSummary(container) {
+                const grandTotal = this.state.sheets.reduce((acc, sheet) => {
+                    const res = this.calculateSheetTotal(sheet.id);
+                    return acc + (res.error ? 0 : res.value);
+                }, 0);
+
+                let html = `
+                    <div class="sheet-header">
+                        <h1 style="margin:0; font-size: 2rem;">まとめで見る</h1>
+                    </div>
+                    <div class="summary-table-container">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>シート名</th>
+                                    <th style="text-align:right;">合計</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                this.state.sheets.forEach(sheet => {
+                    const res = this.calculateSheetTotal(sheet.id);
+                    const val = res.error ? `<span class="text-error">Error (${res.error})</span>` : Utils.formatNumber(res.value);
+                    html += `
+                        <tr>
+                            <td style="font-weight: 500;">${sheet.name}</td>
+                            <td style="text-align:right; font-weight: 600; font-family: var(--font-main);">
+                                ${val} <span style="font-size:0.8em; color: var(--text-secondary)">${this.state.unit}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="sheet-footer">
+                        <div>
+                            <div class="total-label">総合計</div>
+                            <div style="font-size: 0.85rem; color: var(--text-tertiary);">全シートの合算</div>
+                        </div>
+                        <div class="total-amount">
+                            ${Utils.formatNumber(grandTotal)} <span style="font-size:0.5em; color: var(--text-secondary);">${this.state.unit}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+            }
+
+            renderSheetEditor(container) {
+                const sheetId = this.state.activeSheetId;
+                const sheet = this.state.sheets.find(s => s.id === sheetId);
+
+                if (!sheet) return;
+
+                // Header
+                const header = document.createElement('div');
+                header.className = 'sheet-header';
+                header.innerHTML = `
+                    <input type="text" class="sheet-title-input" value="${sheet.name}" placeholder="シート名を入力..."
+                        onchange="app.updateSheetName('${sheetId}', this.value)">
+                    <div class="sheet-actions">
+                        <button onclick="app.duplicateSheet('${sheetId}')" title="シートを複製">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="8" width="10" height="14" rx="2" ry="2"></rect><path d="M5 18V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                        <button onclick="app.deleteSheet('${sheetId}')" class="btn-delete" title="シートを削除">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(header);
+
+                // Rows
+                const rowsContainer = document.createElement('div');
+                rowsContainer.className = 'rows-container';
+
+                sheet.rows.forEach(row => {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'row-item';
+
+                    const otherSheets = this.state.sheets.filter(s => s.id !== sheetId);
+
+                    let inputHtml = '';
+                    if (row.type === 'value') {
+                        inputHtml = `<input type="number" inputmode="decimal" step="any" class="row-input text-right" value="${row.value}" 
+                            onchange="app.updateRow('${sheetId}', '${row.id}', 'value', this.value)">`;
+                    } else {
+                        // Ref Selector
+                        const options = otherSheets.map(s =>
+                            `<option value="${s.id}" ${row.refSheetId === s.id ? 'selected' : ''}>${s.name}</option>`
+                        ).join('');
+                        inputHtml = `
+                            <select class="row-select w-full" onchange="app.updateRow('${sheetId}', '${row.id}', 'refSheetId', this.value)">
+                                <option value="">-- 選択 --</option>
+                                ${options}
+                            </select>
+                        `;
+                    }
+
+                    // Calculation for this row display
+                    let rowValDisplay = 0;
+                    let rowError = null;
+                    const op = row.operator !== undefined ? row.operator : 1;
+
+                    if (row.type === 'value') {
+                        rowValDisplay = row.value * op;
+                    } else if (row.type === 'ref') {
+                        if (row.refSheetId) {
+                            const refRes = this.calculateSheetTotal(row.refSheetId);
+                            if (refRes.error) {
+                                rowError = refRes.error;
+                            } else {
+                                rowValDisplay = refRes.value * op;
+                            }
+                        } else {
+                            rowValDisplay = 0;
+                        }
+                    }
+
+                    const displayColor = rowError ? 'var(--error)' : (op === -1 ? 'var(--warning)' : 'var(--text-primary)');
+                    const operatorBtnStyle = op === 1
+                        ? 'color: var(--success); font-weight:700;'
+                        : 'color: var(--error); font-weight:700;';
+
+                    rowEl.innerHTML = `
+                        <div class="row-drag-handle" onclick="app.toggleOperator('${sheetId}', '${row.id}')">
+                            <span style="${operatorBtnStyle}">${op === 1 ? '＋' : '－'}</span>
+                        </div>
+                        <input type="text" class="row-input" style="font-weight:500;" placeholder="項目名" value="${row.label}"
+                            onchange="app.updateRow('${sheetId}', '${row.id}', 'label', this.value)">
+                        
+                        <select class="row-select" onchange="app.updateRow('${sheetId}', '${row.id}', 'type', this.value)">
+                            <option value="value" ${row.type === 'value' ? 'selected' : ''}>金額</option>
+                            <option value="ref" ${row.type === 'ref' ? 'selected' : ''}>参照</option>
+                        </select>
+
+                        <div class="row-input-area">
+                            ${inputHtml}
+                        </div>
+
+                        <div style="display:flex; gap: 4px; justify-content: flex-end;">
+                           <button class="action-row-btn" onclick="app.duplicateRow('${sheetId}', '${row.id}')" title="行を複製">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="11" width="14" height="8" rx="2" ry="2"></rect><path d="M3 15V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"></path></svg>
+                           </button>
+                           <button class="delete-row-btn" onclick="app.deleteRow('${sheetId}', '${row.id}')" title="行を削除">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                           </button>
+                        </div>
+                    `;
+                    rowsContainer.appendChild(rowEl);
+                });
+
+                // Add Row Button
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-row-btn';
+                addBtn.innerText = '+ 行を追加';
+                addBtn.onclick = () => app.addRow(sheetId);
+                rowsContainer.appendChild(addBtn);
+
+                container.appendChild(rowsContainer);
+
+                // Footer
+                const totalRes = this.calculateSheetTotal(sheetId);
+                const footer = document.createElement('div');
+                footer.className = 'sheet-footer';
+                footer.innerHTML = `
+                    <div class="total-label">合計</div>
+                    <div class="total-amount">
+                        ${totalRes.error ? '<span class="text-error" style="font-size:1.5rem">循環参照</span>' : Utils.formatNumber(totalRes.value)} 
+                        <span style="font-size:0.5em; color: var(--text-secondary);">${this.state.unit}</span>
+                    </div>
+                `;
+                container.appendChild(footer);
+            }
+        }
+
+        // Initialize App
+        const app = new App();
+
+    </script>
+</body>
+
+</html>
